@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.class
+
+# Django
+db.sqlite3
+db.sqlite4
+local_settings.py
+media/
+staticfiles/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Celery
+celerybeat-schedule
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.eslintcache
+
+# AI/ML Specific
+*.log
+.chroma/
+.ipynb_checkpoints/
+models/downloads/
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store

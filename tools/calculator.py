@@ -14,16 +14,24 @@ OPERATORS = {
 
 
 def _evaluate(node):
-    if isinstance(node, ast.Constant):  # numbers
+    # Block strings, booleans, and non-numeric types early
+    if isinstance(node, ast.Constant):
+        if type(node.value) not in (int, float):
+            raise ValueError("Only literal numbers are allowed.")
         return node.value
 
     if isinstance(node, ast.BinOp):
         left = _evaluate(node.left)
         right = _evaluate(node.right)
 
+        # Prevent CPU-melting operations (e.g., 9**9**9)
+        if isinstance(node.op, ast.Pow):
+            if right > 1000 or left > 10000:
+                raise ValueError("Exponent or base too large to calculate safely.")
+
         op = OPERATORS.get(type(node.op))
         if op is None:
-            raise ValueError("Unsupported operator.")
+            raise ValueError("Unsupported mathematical operator.")
 
         return op(left, right)
 
@@ -36,41 +44,33 @@ def _evaluate(node):
 
         return op(operand)
 
-    raise ValueError("Invalid expression.")
+    raise ValueError("Invalid mathematical syntax.")
 
 
 def calculator(expression: str) -> dict:
     if not expression or not expression.strip():
         return {
             "success": False,
-            "error": {
-                "message": "Expression cannot be empty."
-            }
+            "error": { "message": "Expression cannot be empty." }
         }
 
     try:
-        tree = ast.parse(expression, mode="eval")
+        tree = ast.parse(expression.strip(), mode="eval")
         result = _evaluate(tree.body)
 
         return {
             "success": True,
-            "data": {
-                "result": result
-            }
+            "data": { "result": result }
         }
 
     except ZeroDivisionError:
         return {
             "success": False,
-            "error": {
-                "message": "Division by zero."
-            }
+            "error": { "message": "Division by zero." }
         }
-
-    except Exception:
+    except Exception as e:
+        error_msg = str(e) if str(e) else "Invalid mathematical expression."
         return {
             "success": False,
-            "error": {
-                "message": "Invalid mathematical expression."
-            }
+            "error": { "message": error_msg }
         }

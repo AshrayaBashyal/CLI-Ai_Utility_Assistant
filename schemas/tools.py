@@ -21,3 +21,6 @@ CALCULATOR_TOOL = {
         },
     },
 }
+
+
+TOOLS = [CALCULATOR_TOOL]

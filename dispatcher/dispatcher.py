@@ -1,9 +1,4 @@
-from tools.calculator import calculator
-
-
-TOOL_REGISTRY = {
-    "calculator": calculator,
-}
+from tools.registry import TOOL_REGISTRY
 
 
 def dispatch(tool_name: str, arguments: dict) -> dict:

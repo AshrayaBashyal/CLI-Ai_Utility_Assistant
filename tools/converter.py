@@ -41,9 +41,9 @@ def convert(value: float, from_unit: str, to_unit: str) -> Dict[str, Any]:
         cat_src, cat_dest = find_category(src), find_category(dest)
         
         # Validation checks
-        if not cat_src: return {"success": False, "error": f"Invalid unit: '{from_unit}'"}
-        if not cat_dest: return {"success": False, "error": f"Invalid unit: '{to_unit}'"}
-        if cat_src != cat_dest: return {"success": False, "error": f"Cannot convert {cat_src} to {cat_dest}"}
+        if not cat_src: return {"success": False, "error": {"mesage": f"Invalid unit: '{from_unit}'"}}
+        if not cat_dest: return {"success": False, "error": {"mesage": f"Invalid unit: '{to_unit}'"}}
+        if cat_src != cat_dest: return {"success": False, "error": {"message": f"Cannot convert {cat_src} to {cat_dest}"}}
         
         # Calculate result
         if cat_src == "temperature":
@@ -57,4 +57,4 @@ def convert(value: float, from_unit: str, to_unit: str) -> Dict[str, Any]:
             "data": {"value": result, "unit": dest, "category": cat_src}
         }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": {"message": str(e)}}

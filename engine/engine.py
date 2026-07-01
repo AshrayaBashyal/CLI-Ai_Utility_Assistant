@@ -39,9 +39,12 @@ class ToolCallingEngine:
 
                 return message.content
 
-            # Store the assistant message containing the tool call -> convert chatcompletion object(Pydantic object) into dict
-            self.messages.append(message.model_dump(exclude_none=True))
-
+            # Store the assistant message containing the tool call
+            if isinstance(message, dict):
+                self.messages.append(message)
+            else:
+                self.messages.append(message.model_dump(exclude_none=True))   # convert chatcompletion object(Pydantic object) into dict
+                
             # Execute every requested tool.
             for tool_call in message.tool_calls:
                 tool_name = tool_call.function.name

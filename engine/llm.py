@@ -1,6 +1,6 @@
 from config import MODEL
 from schemas import TOOLS
-from utils.client import client
+from client.groq_client import client
 from typing import List, Dict, Any
 
 class LLMClient:

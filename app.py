@@ -19,7 +19,8 @@ def main():
 
         # Allow the user to wipe context to save token costs
         if user_input.lower() == "/clear":
-            engine.messages = []
+            # engine.messages = []
+            engine.reset_history()
             print("System: Conversation memory cleared.\n") 
             continue
 

@@ -1,63 +1,47 @@
 import json
-
-from config import MODEL
+from typing import Any
 from dispatcher.dispatcher import dispatch
-from schemas.tools import TOOLS
-from utils.client import client
-
+from engine.conversation import ConversationManager
+from engine.llm import LLMClient
 
 class ToolCallingEngine:
     def __init__(self):
-        self.messages = []
+        self.conversation = ConversationManager()
+        self.llm = LLMClient()
 
     def chat(self, user_message: str) -> str:
-        # Add the user's message to the conversation
-        self.messages.append(
-            {
-                "role": "user",
-                "content": user_message,
-            }
-        )
+        self.conversation.add_user_message(user_message)
 
         while True:
-            response = client.chat.completions.create(
-                model=MODEL,
-                messages=self.messages,
-                tools=TOOLS,
-            )
-
+            # -Generate text turn via LLM wrapper
+            response = self.llm.get_completion(self.conversation.get_history())
             message = response.choices[0].message
 
-            # Base case - no tool call
+            # Base case: Response contains text and no requests
             if not message.tool_calls:
-                self.messages.append(
-                    {
-                        "role": "assistant",
-                        "content": message.content,
-                    }
-                )
-
+                self.conversation.add_assistant_message(message.content)
                 return message.content
 
-            # Store the assistant message containing the tool call
+            # Parse and store the assistant message data dict
             if isinstance(message, dict):
-                self.messages.append(message)
+                self.conversation.append_raw_message(message)
             else:
-                self.messages.append(message.model_dump(exclude_none=True))   # convert chatcompletion object(Pydantic object) into dict
-                
-            # Execute every requested tool.
+                self.conversation.append_raw_message(message.model_dump(exclude_none=True))
+
+            # -Iterate through requested tool chains concurrently
             for tool_call in message.tool_calls:
                 tool_name = tool_call.function.name
-
                 arguments = json.loads(tool_call.function.arguments)
 
+                # Execute target function
                 result = dispatch(tool_name, arguments)
 
-                # Add tool output to the conversation
-                self.messages.append(
-                    {
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "content": json.dumps(result),
-                    }
+                # Store outcome block straight into manager history
+                self.conversation.add_tool_message(
+                    tool_call_id=tool_call.id,
+                    content=json.dumps(result)
                 )
+
+    def reset_history(self) -> None:
+        """Call this from app.py when '/clear' text matches."""
+        self.conversation.clear()

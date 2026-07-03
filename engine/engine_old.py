@@ -3,7 +3,7 @@ import json
 from config import MODEL
 from dispatcher.dispatcher import dispatch
 from schemas.old_tools_schema import TOOLS
-from utils.client import client
+from client.groq_client import client
 
 
 class ToolCallingEngine:

@@ -1,7 +1,8 @@
 from datetime import datetime
 
 
-def current_time() -> dict:
+# **kwargs absorbs any random arguments the LLM invents, preventing a TypeError
+def current_time(**kwargs) -> dict:
     try:
         return {
             "success": True,

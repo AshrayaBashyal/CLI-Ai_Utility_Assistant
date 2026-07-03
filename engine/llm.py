@@ -1,5 +1,5 @@
 from config import MODEL
-from schemas.tools import TOOLS
+from schemas import TOOLS
 from utils.client import client
 from typing import List, Dict, Any
 

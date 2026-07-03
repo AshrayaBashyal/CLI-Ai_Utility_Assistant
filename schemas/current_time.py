@@ -1,3 +1,5 @@
+#  it seems - Groq's hardware parser is broken for this tool.
+
 CURRENT_TIME_TOOL = {
     "type": "function",
     "function": {
